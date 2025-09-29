@@ -1,0 +1,33 @@
+# Python cache & artefatos
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Build / distribuição (se aplicável)
+build/
+dist/
+
+# Arquivos de especificação / executáveis gerados
+*.spec
+*.exe
+
+# Dados sensíveis / configuração local
+.env
+.env.*
+
+# IDEs / editores / sistema
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Outros logs
+*.log
