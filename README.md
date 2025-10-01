@@ -1,2 +1,2 @@
 # PLANILHA-DE-IP
-Progrma para padronizar o ip dos clientes
+Progarma para padronizar o ip dos clientes
