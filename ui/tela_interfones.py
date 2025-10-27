@@ -16,7 +16,10 @@ class TelaInterfones(ctk.CTkToplevel):
     def __init__(self, master=None):
         super().__init__(master)
         self.title("Interfones")
-        self.attributes("-fullscreen", True)
+
+        # Tela cheia (com pequeno delay para funcionar no executável)
+        self.after(100, lambda: self.attributes("-fullscreen", True))
+        self.bind("<Escape>", lambda e: self.attributes("-fullscreen", False))
         self.resizable(True, True)
 
         self.master = master
@@ -33,7 +36,7 @@ class TelaInterfones(ctk.CTkToplevel):
         top_frame = ctk.CTkFrame(self, height=60)
         top_frame.pack(fill="x", side="top")
 
-        btn_voltar = ctk.CTkButton(top_frame, text="← Voltar", width=100, command=self.voltar)
+        btn_voltar = ctk.CTkButton(top_frame, text="? Voltar", width=100, command=self.voltar)
         btn_voltar.pack(side="left", padx=20, pady=10)
 
         titulo = ctk.CTkLabel(top_frame, text="Lista de Interfones", font=("Arial", 24, "bold"))
@@ -50,7 +53,13 @@ class TelaInterfones(ctk.CTkToplevel):
         # Botão de adicionar
         self.btn_add = ctk.CTkButton(self, text="Adicionar Interfone", height=40,
                                      command=self.adicionar_interfone)
-        self.btn_add.pack(pady=20)
+        self.btn_add.pack(pady=10)
+
+        # Botão de exportar PDF
+        self.btn_export_pdf = ctk.CTkButton(self, text="Exportar PDF", height=40,
+                                            fg_color="#3498DB", hover_color="#2980B9",
+                                            command=self.exportar_pdf)
+        self.btn_export_pdf.pack(pady=10)
 
     def load_interfones(self):
         for widget in self.frame_lista.winfo_children():
@@ -161,6 +170,39 @@ class TelaInterfones(ctk.CTkToplevel):
                 if linha.strip() != f"{nome}|{ip}":
                     f.write(linha)
         self.load_interfones()
+
+    def exportar_pdf(self):
+        from reportlab.lib.pagesizes import A4
+        from reportlab.pdfgen import canvas
+
+        pdf_path = resource_path(os.path.join("data", "interfones.pdf"))
+        with open(self.interfone_path, "r") as f:
+            linhas = [line.strip() for line in f if line.strip()]
+
+        if not linhas:
+            messagebox.showinfo("Exportar PDF", "Nenhum interfone cadastrado.")
+            return
+
+        c = canvas.Canvas(pdf_path, pagesize=A4)
+        largura, altura = A4
+        y = altura - 80
+
+        c.setFont("Helvetica-Bold", 18)
+        c.drawString(50, y, "Lista de Interfones")
+        y -= 40
+        c.setFont("Helvetica", 12)
+
+        for linha in linhas:
+            nome, ip = linha.split("|")
+            c.drawString(50, y, f"Nome: {nome} - IP: {ip}")
+            y -= 20
+            if y < 80:
+                c.showPage()
+                y = altura - 80
+                c.setFont("Helvetica", 12)
+
+        c.save()
+        messagebox.showinfo("Exportar PDF", f"PDF gerado com sucesso em:\n{pdf_path}")
 
     def voltar(self):
         self.destroy()

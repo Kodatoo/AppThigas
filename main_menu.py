@@ -1,12 +1,11 @@
 import customtkinter as ctk
 from PIL import Image
 from utils import resource_path
-
 import os
 
 from ui.tela_interfones import TelaInterfones
 from ui.tela_leitor_facial import TelaLeitorFacial
-from ui.tela_lpr import TelaLPR  
+from ui.tela_lpr import TelaLPR
 from ui.tela_controladora import TelaControladora
 from ui.tela_computadores import TelaComputadores
 from ui.tela_raspberry_orangepi import TelaRaspberryOrangePi
@@ -22,12 +21,21 @@ class MainMenu(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Menu de Dispositivos")
-        self.attributes("-fullscreen", True)
+
+        # === TELA CHEIA GARANTIDA ===
+        self.state("zoomed")  # Maximiza a janela no Windows
+        self.attributes("-fullscreen", True)  # Tela cheia real
+        self.bind("<Escape>", self.toggle_fullscreen)  # Permite sair com ESC
 
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
 
         self.create_widgets()
+
+    def toggle_fullscreen(self, event=None):
+        """Alterna entre modo tela cheia e modo janela."""
+        is_fullscreen = self.attributes("-fullscreen")
+        self.attributes("-fullscreen", not is_fullscreen)
 
     def create_widgets(self):
         # === Cabeçalho ===
@@ -100,7 +108,6 @@ class MainMenu(ctk.CTk):
             btn.grid(row=row, column=col, padx=30, pady=30, sticky="nsew")
 
     def handle_click(self, label):
-        # Telas que abrem novas janelas e devem esconder o menu
         if label == "Interfone":
             self.withdraw()
             TelaInterfones(master=self)
@@ -142,7 +149,6 @@ class MainMenu(ctk.CTk):
             TelaRoteadores(master=self)
 
         elif label == "Relatórios":
-            # Gera o relatório sem fechar o menu
             relatorio = RelatorioPDF()
             relatorio.gerar_pdf()
 
@@ -152,3 +158,8 @@ class MainMenu(ctk.CTk):
 
         else:
             print(f"Abrir tela para: {label}")
+
+
+if __name__ == "__main__":
+    app = MainMenu()
+    app.mainloop()
